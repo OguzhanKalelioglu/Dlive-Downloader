@@ -6,6 +6,7 @@ import shutil
 import sys
 import tempfile
 from urllib import request
+from urllib.parse import urlparse
 
 
 def main():
@@ -18,8 +19,9 @@ def main():
                         default=os.getcwd())
     args = parser.parse_args()
 
-    vod_id = args.url.split('+')[1]
-    pb_info = get_playback_info(args.url)
+    permlink = extract_permlink(args.url)
+    vod_id = permlink.split('+')[-1]
+    pb_info = get_playback_info(permlink)
 
     # define video info
     info = pb_info['data']['pastBroadcast']
@@ -49,25 +51,30 @@ def main():
     sys.exit(0)
 
 
-def get_playback_info(url):
-    perm_link = url.split('/')[-1]
-    api_url = 'https://graphigo.prd.dlive.tv/'
-    data = {"operationName": "PastBroadcastPage",
-            "variables": {
-                      "permlink": perm_link,
-                      "commentsFirst": 0,
-                      "topContributionsFirst": 0,
-                      "isLoggedIn": False
-                  },
-            "extensions": {
-                      "persistedQuery": {
-                          "version": 1,
-                          "sha256Hash": "8fa2f4a94174e9552b76190ae847926e283f292e24b5f6b4908acffb6902805f"
-                      }
-                  }
-            }
+def extract_permlink(url):
+    parsed = urlparse(url)
+    path = parsed.path or ''
+    permlink = path.rstrip('/').split('/')[-1]
+    if not permlink:
+        raise ValueError('Vod adresinden permlink alınamadı')
+    return permlink
 
-    data = json.dumps(data).encode()
+
+def get_playback_info(permlink):
+    api_url = 'https://graphigo.prd.dlive.tv/'
+    payload = {
+        "operationName": "PastBroadcastPage",
+        "variables": {
+            "permlink": permlink
+        },
+        "query": (
+            "query PastBroadcastPage($permlink: String!) { "
+            "pastBroadcast(permlink: $permlink) { "
+            "title playbackUrl creator { displayname } } }"
+        )
+    }
+
+    data = json.dumps(payload).encode()
     r = request.Request(api_url, method='POST')
     r.add_header('Content-Type', 'application/json')
     response = request.urlopen(r, data=data)
@@ -199,7 +206,7 @@ class Video(object):
             return self._duration
         self._duration = 0
         for line in self.m3u8.splitlines():
-            match = re.search('^#EXTINF:(\d*.\d*),', line)
+            match = re.search(r'^#EXTINF:(\d*.\d*),', line)
             if match:
                 self._duration += float(match.group(1))
         return self._duration
