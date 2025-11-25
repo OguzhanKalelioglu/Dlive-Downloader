@@ -197,7 +197,9 @@ class DownloaderApp:
 
     def _handle_loaded(self, broadcast: Broadcast, variants: list[StreamVariant]) -> None:
         self.broadcast = broadcast
-        self.variant_items = [VariantDisplay(v, v.display_name()) for v in variants]
+        self.variant_items = [
+            VariantDisplay(v, v.display_name(broadcast.duration_seconds)) for v in variants
+        ]
         self.variant_list.delete(0, END)
         for item in self.variant_items:
             self.variant_list.insert(END, item.text)
@@ -212,7 +214,12 @@ class DownloaderApp:
             return
         percent = int((completed / total) * 100)
         self.progress.config(maximum=100, value=percent)
-        stage_text = "Parçalar indiriliyor" if stage == "segments" else "Dosya birleştiriliyor"
+        stage_texts = {
+            "segments": "Parçalar indiriliyor",
+            "merge": "Dosya birleştiriliyor",
+            "remux": "MP4 hazırlanıyor",
+        }
+        stage_text = stage_texts.get(stage, "İşleniyor")
         self._set_status(f"{stage_text}: %{percent}")
 
     def _handle_done(self, output: str) -> None:

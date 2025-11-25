@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="yellowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="darkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d2d2d;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background - Dark rounded square -->
+  <rect width="1024" height="1024" rx="200" fill="url(#darkGrad)"/>
+  
+  <!-- Large "D" Letter styled like DLive -->
+  <g transform="translate(512, 512)">
+    <!-- Outer D shape -->
+    <path d="M -180 -280 
+             L -60 -280
+             C 160 -280, 280 -140, 280 0
+             C 280 140, 160 280, -60 280
+             L -180 280
+             Z
+             M -60 -180
+             L -60 180
+             L -40 180
+             C 100 180, 180 100, 180 0
+             C 180 -100, 100 -180, -40 -180
+             Z"
+          fill="url(#yellowGrad)" 
+          filter="url(#glow)"/>
+  </g>
+  
+  <!-- Play triangle overlay -->
+  <g transform="translate(580, 512)">
+    <path d="M 0 -80 L 140 0 L 0 80 Z" 
+          fill="#FFD700" 
+          opacity="0.9"
+          filter="url(#glow)"/>
+  </g>
+  
+  <!-- Download arrow at bottom -->
+  <g transform="translate(512, 820)">
+    <path d="M -30 -60 L -30 0 L -60 0 L 0 50 L 60 0 L 30 0 L 30 -60 Z" 
+          fill="#FFD700" 
+          opacity="0.8"/>
+  </g>
+  
+  <!-- Decorative elements - corner accents -->
+  <circle cx="150" cy="150" r="25" fill="#FFD700" opacity="0.3"/>
+  <circle cx="874" cy="150" r="20" fill="#FFD700" opacity="0.3"/>
+  <circle cx="150" cy="874" r="20" fill="#FFD700" opacity="0.3"/>
+  <circle cx="874" cy="874" r="25" fill="#FFD700" opacity="0.3"/>
+</svg>

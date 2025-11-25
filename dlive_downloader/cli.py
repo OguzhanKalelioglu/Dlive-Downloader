@@ -38,7 +38,7 @@ def list_variants(broadcast: Broadcast, variants: list[StreamVariant]) -> None:
         duration = ""
     print(header + duration)
     for variant in variants:
-        print(f"{variant.index}. {variant.display_name()}")
+        print(f"{variant.index}. {variant.display_name(broadcast.duration_seconds)}")
 
 
 def download_variant(
@@ -58,7 +58,14 @@ def download_variant(
 
     def update_progress(completed: int, total: int, stage: str) -> None:
         nonlocal progress_bar
-        description = "Downloading segments" if stage == "segments" else "Merging segments"
+        if stage == "segments":
+            description = "Downloading segments"
+        elif stage == "merge":
+            description = "Merging segments"
+        elif stage == "remux":
+            description = "Packaging MP4"
+        else:
+            description = "Processing"
         if progress_bar is None or progress_bar.desc != description or progress_bar.total != total:
             if progress_bar is not None:
                 progress_bar.close()
@@ -146,7 +153,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     filename = args.filename
     if filename:
         filename = slugify(filename)
-        if not filename.lower().endswith(".mp4"):
+        if not Path(filename).suffix:
             filename += ".mp4"
 
     try:
