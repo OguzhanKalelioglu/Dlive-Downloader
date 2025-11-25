@@ -7,3 +7,4 @@ build/
 dist/
 *.spec
 !packaging/macos/dlive_downloader.spec
+.pyinstaller_config
